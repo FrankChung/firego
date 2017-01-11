@@ -98,7 +98,7 @@ func TestStartAt(t *testing.T) {
 	)
 	defer server.Close()
 
-	fb.StartAt("3").Value("")
+	fb.StartAt(3).Value("")
 	fb.StartAt("foo").Value("")
 	require.Len(t, server.receivedReqs, 2)
 
@@ -117,7 +117,7 @@ func TestEndAt(t *testing.T) {
 	)
 	defer server.Close()
 
-	fb.EndAt("4").Value("")
+	fb.EndAt(4).Value("")
 	fb.EndAt("theend").Value("")
 	require.Len(t, server.receivedReqs, 2)
 
@@ -159,7 +159,7 @@ func TestQueryMultipleParams(t *testing.T) {
 	)
 	defer server.Close()
 
-	fb.OrderBy("user_id").StartAt("7").Value("")
+	fb.OrderBy("user_id").StartAt(7).Value("")
 	require.Len(t, server.receivedReqs, 1)
 
 	req := server.receivedReqs[0]
