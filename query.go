@@ -1,6 +1,7 @@
 package firego
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -14,10 +15,10 @@ import (
 //    StartAt(`"foo"`)  // -> endAt="foo"
 //
 // Reference https://www.firebase.com/docs/rest/guide/retrieving-data.html#section-rest-filtering
-func (fb *Firebase) StartAt(value string) *Firebase {
+func (fb *Firebase) StartAt(value interface{}) *Firebase {
 	c := fb.copy()
 	if value != "" {
-		c.params.Set(startAtParam, escapeString(value))
+		c.params.Set(startAtParam, escapeParameter(value))
 	} else {
 		c.params.Del(startAtParam)
 	}
@@ -33,10 +34,10 @@ func (fb *Firebase) StartAt(value string) *Firebase {
 //    EndAt(`"foo"`)  // -> endAt="foo"
 //
 // Reference https://www.firebase.com/docs/rest/guide/retrieving-data.html#section-rest-filtering
-func (fb *Firebase) EndAt(value string) *Firebase {
+func (fb *Firebase) EndAt(value interface{}) *Firebase {
 	c := fb.copy()
 	if value != "" {
-		c.params.Set(endAtParam, escapeString(value))
+		c.params.Set(endAtParam, escapeParameter(value))
 	} else {
 		c.params.Del(endAtParam)
 	}
@@ -55,7 +56,7 @@ func (fb *Firebase) EndAt(value string) *Firebase {
 func (fb *Firebase) OrderBy(value string) *Firebase {
 	c := fb.copy()
 	if value != "" {
-		c.params.Set(orderByParam, escapeString(value))
+		c.params.Set(orderByParam, escapeParameter(value))
 	} else {
 		c.params.Del(orderByParam)
 	}
@@ -65,22 +66,23 @@ func (fb *Firebase) OrderBy(value string) *Firebase {
 // EqualTo sends the query string equalTo so that one can find a single value
 //
 // Reference https://www.firebase.com/docs/rest/guide/retrieving-data.html#section-rest-filtering
-func (fb *Firebase) EqualTo(value string) *Firebase {
+func (fb *Firebase) EqualTo(value interface{}) *Firebase {
 	c := fb.copy()
 	if value != "" {
-		c.params.Set(equalToParam, escapeString(value))
+		c.params.Set(equalToParam, escapeParameter(value))
 	} else {
 		c.params.Del(equalToParam)
 	}
 	return c
 }
 
-func escapeString(s string) string {
-	_, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		return `"` + strings.Trim(s, `"`) + `"`
+func escapeParameter(s interface{}) string {
+	switch s.(type) {
+	case string:
+		return fmt.Sprintf("%q", strings.Trim(s.(string), `"`))
+	default:
+		return fmt.Sprintf("%v", s)
 	}
-	return s
 }
 
 // LimitToFirst creates a new Firebase reference with the
